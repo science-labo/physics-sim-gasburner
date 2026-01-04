@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ガスバーナー操作シミュレーター - 理科実験学習アプリ</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header>
+        <h1><i class="fas fa-fire"></i> ガスバーナー操作シミュレーター</h1>
+        <p class="subtitle">正しい手順を学んで、安全にガスバーナーを使いこなそう！</p>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="container">
+        <!-- ゲーム情報パネル -->
+        <div class="info-panel">
+            <div class="info-item">
+                <i class="fas fa-trophy"></i>
+                <div>
+                    <span class="label">スコア</span>
+                    <span class="value" id="score">0</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-clock"></i>
+                <div>
+                    <span class="label">タイマー</span>
+                    <span class="value" id="timer">00:00</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-list-ol"></i>
+                <div>
+                    <span class="label">ステップ</span>
+                    <span class="value" id="current-step">0/8</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-heart"></i>
+                <div>
+                    <span class="label">ライフ</span>
+                    <span class="value" id="lives">❤️❤️❤️</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ゲームエリア -->
+        <div class="game-area">
+            <!-- 左側：ガスバーナービジュアル -->
+            <div class="burner-container">
+                <div class="burner-visual" id="burner">
+                    <!-- 炎のエフェクト -->
+                    <div class="flame" id="flame">
+                        <div class="flame-inner"></div>
+                        <div class="flame-core"></div>
+                    </div>
+                    
+                    <!-- ガスバーナー本体 -->
+                    <div class="burner-body">
+                        <!-- 上部（バーナー口） -->
+                        <div class="burner-top"></div>
+                        
+                        <!-- 中央部（筒） -->
+                        <div class="burner-tube">
+                            <!-- 空気調節ねじ -->
+                            <div class="air-screw" id="air-screw">
+                                <div class="screw-head">空気</div>
+                                <div class="screw-indicator"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 下部（ガス導入部） -->
+                        <div class="burner-bottom">
+                            <!-- ガス調節ねじ -->
+                            <div class="gas-screw" id="gas-screw">
+                                <div class="screw-head">ガス</div>
+                                <div class="screw-indicator"></div>
+                            </div>
+                            
+                            <!-- コック -->
+                            <div class="cock" id="cock">
+                                <div class="cock-handle"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- ホース -->
+                        <div class="hose"></div>
+                    </div>
+                    
+                    <!-- 元栓 -->
+                    <div class="main-valve" id="main-valve">
+                        <div class="valve-body">
+                            <div class="valve-handle"></div>
+                            <span class="valve-label">元栓</span>
+                        </div>
+                    </div>
+                    
+                    <!-- マッチ/ライター -->
+                    <div class="lighter" id="lighter">
+                        <i class="fas fa-fire"></i>
+                        <span>点火</span>
+                    </div>
+                </div>
+                
+                <!-- 爆発エフェクト -->
+                <div class="explosion" id="explosion">
+                    <div class="explosion-circle"></div>
+                    <div class="explosion-text">💥 BOOM! 💥</div>
+                </div>
+            </div>
+
+            <!-- 右側：インストラクション＆コントロール -->
+            <div class="control-panel">
+                <!-- 現在のステップ表示 -->
+                <div class="step-display" id="step-display">
+                    <h2>ステップ <span id="step-number">0</span></h2>
+                    <p id="step-instruction">「スタート」ボタンを押して、ガスバーナーの操作を始めましょう！</p>
+                    <div class="step-hint" id="step-hint"></div>
+                </div>
+
+                <!-- 手順ガイド（トグル可能） -->
+                <div class="guide-toggle">
+                    <label>
+                        <input type="checkbox" id="show-guide" checked>
+                        <span>手順ガイドを表示</span>
+                    </label>
+                </div>
+
+                <div class="procedure-guide" id="procedure-guide">
+                    <h3><i class="fas fa-book"></i> 正しい手順</h3>
+                    <ol id="procedure-list">
+                        <li class="pending">ガス調節ねじが閉まっているか確認</li>
+                        <li class="pending">空気調節ねじが閉まっているか確認</li>
+                        <li class="pending">元栓を開ける</li>
+                        <li class="pending">マッチまたはライターを準備</li>
+                        <li class="pending">コックを開く</li>
+                        <li class="pending">ガス調節ねじをゆっくり開く</li>
+                        <li class="pending">点火する</li>
+                        <li class="pending">空気調節ねじで炎を調整（青い炎）</li>
+                    </ol>
+                </div>
+
+                <!-- ゲームコントロール -->
+                <div class="game-controls">
+                    <button class="btn btn-primary" id="start-btn">
+                        <i class="fas fa-play"></i> スタート
+                    </button>
+                    <button class="btn btn-secondary" id="reset-btn">
+                        <i class="fas fa-redo"></i> リセット
+                    </button>
+                    <button class="btn btn-info" id="hint-btn">
+                        <i class="fas fa-lightbulb"></i> ヒント
+                    </button>
+                </div>
+
+                <!-- モード選択 -->
+                <div class="mode-selection">
+                    <h3><i class="fas fa-gamepad"></i> ゲームモード</h3>
+                    <div class="mode-buttons">
+                        <button class="mode-btn active" data-mode="practice">
+                            <i class="fas fa-graduation-cap"></i>
+                            練習モード
+                        </button>
+                        <button class="mode-btn" data-mode="challenge">
+                            <i class="fas fa-stopwatch"></i>
+                            チャレンジ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 安全注意事項 -->
+                <div class="safety-info">
+                    <h3><i class="fas fa-exclamation-triangle"></i> 安全注意事項</h3>
+                    <ul>
+                        <li>必ず正しい手順で操作する</li>
+                        <li>炎の色は青色が正しい</li>
+                        <li>赤い炎は不完全燃焼（危険）</li>
+                        <li>実際の実験では保護メガネを着用</li>
+                        <li>先生の指示に従って操作する</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 結果モーダル -->
+        <div class="modal" id="result-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="result-title">🎉 成功！</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="result-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-trophy"></i>
+                            <span class="stat-label">スコア</span>
+                            <span class="stat-value" id="final-score">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-clock"></i>
+                            <span class="stat-label">タイム</span>
+                            <span class="stat-value" id="final-time">00:00</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <span class="stat-label">評価</span>
+                            <span class="stat-value" id="rating">⭐⭐⭐</span>
+                        </div>
+                    </div>
+                    <p id="result-message"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="play-again-btn">
+                        <i class="fas fa-redo"></i> もう一度挑戦
+                    </button>
+                    <button class="btn btn-secondary" id="close-modal-btn">
+                        <i class="fas fa-times"></i> 閉じる
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- フッター -->
+    <footer>
+        <p>© 2024 理科実験学習アプリ | 中学生向けガスバーナー操作シミュレーター</p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
